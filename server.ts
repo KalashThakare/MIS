@@ -2,27 +2,59 @@ import { createServer } from "node:http";
 import { createApp } from "./src/app";
 import { env } from "./src/config/env";
 import { logger } from "./src/shared/logger/pino";
+import sequelize, { connectDB } from "./src/config/db";
+import { initModels, syncModels } from "./src/shared/database";
 
 const app = createApp();
 const server = createServer(app);
 
-server.listen(env.port, () => {
-  logger.info({ port: env.port }, "HTTP server listening.");
-});
+async function startServer() {
+  try {
+    await connectDB();
+    initModels();
+    await syncModels();
 
-function shutdown(signal: NodeJS.Signals): void {
-  logger.info({ signal }, "Shutdown signal received. Closing HTTP server.");
+    server.listen(env.port, () => {
+      logger.info(`Server running on port ${env.port}`);
+    });
 
-  server.close((error) => {
-    if (error) {
-      logger.error({ error }, "HTTP server closed with an error.");
+    registerShutdownHandlers();
+
+  } catch (err) {
+    logger.fatal({ err }, "Failed to start server");
+    process.exit(1);
+  }
+}
+
+function registerShutdownHandlers() {
+  const shutdown = async (signal: string) => {
+    logger.info(`${signal} received — shutting down gracefully`);
+
+    server.close(async () => {
+      logger.info("HTTP server closed");
+      await sequelize.close();
+      logger.info("DB connection closed");
+      process.exit(0);
+    });
+
+    setTimeout(() => {
+      logger.error("Forced shutdown after timeout");
       process.exit(1);
-    }
+    }, 10_000).unref();
+  };
 
-    logger.info("HTTP server closed.");
-    process.exit(0);
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+
+  process.on("unhandledRejection", (reason) => {
+    logger.fatal({ reason }, "Unhandled promise rejection");
+    process.exit(1);
+  });
+
+  process.on("uncaughtException", (err) => {
+    logger.fatal({ err }, "Uncaught exception");
+    process.exit(1);
   });
 }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+startServer();

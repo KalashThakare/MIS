@@ -4,7 +4,7 @@ import { AppError } from "../errors/AppError";
 import { logger } from "../logger/pino";
 
 export const errorHandler: ErrorRequestHandler = (error, request, response, _next) => {
-  const appError = error instanceof AppError ? error : new AppError("Internal server error");
+  const appError = toAppError(error);
 
   logger.error({
     traceId: request.traceId,
@@ -22,7 +22,28 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
   response.status(appError.statusCode).json({
     error: {
       message: appError.message,
+      ...(appError.details !== undefined && { details: appError.details }),
       ...(env.nodeEnv !== "production" && { stack: error instanceof Error ? error.stack : undefined })
     }
   });
 };
+
+function toAppError(error: unknown): AppError {
+  if (error instanceof AppError) {
+    return error;
+  }
+
+  if (isMalformedJsonError(error)) {
+    return new AppError("Malformed JSON request body.", 400);
+  }
+
+  return new AppError("Internal server error");
+}
+
+function isMalformedJsonError(error: unknown): error is SyntaxError & { status: number; type: string } {
+  return error instanceof SyntaxError
+    && "status" in error
+    && "type" in error
+    && error.status === 400
+    && error.type === "entity.parse.failed";
+}

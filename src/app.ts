@@ -2,6 +2,7 @@ import cors from "cors";
 import express, { Express } from "express";
 import helmet from "helmet";
 import { env } from "./config/env";
+import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health";
 import { errorHandler } from "./shared/middleware/errorHandler";
 import { notFoundHandler } from "./shared/middleware/notFoundHandler";
@@ -17,6 +18,7 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
   app.use(requestLogger);
 
+  app.use(env.apiPrefix, authRoutes);
   app.use(env.apiPrefix, healthRoutes);
 
   app.use(notFoundHandler);

@@ -6,8 +6,15 @@ type NodeEnv = "development" | "test" | "production";
 
 interface Env {
   apiPrefix: string;
+  jwtExpiresIn: string;
+  jwtSecret: string;
+  database: Database;
   nodeEnv: NodeEnv;
   port: number;
+}
+
+interface Database{
+  db_uri: string
 }
 
 function parsePort(value: string | undefined): number {
@@ -30,8 +37,23 @@ function parseNodeEnv(value: string | undefined): NodeEnv {
   return nodeEnv;
 }
 
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`${name} is required.`);
+  }
+
+  return value;
+}
+
 export const env: Env = {
-  apiPrefix: process.env.API_PREFIX ?? "/api/v1",
   nodeEnv: parseNodeEnv(process.env.NODE_ENV),
-  port: parsePort(process.env.PORT)
+  port: parsePort(process.env.PORT),
+  apiPrefix: process.env.API_PREFIX ?? "/api/v1",
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "1d",
+  jwtSecret: getRequiredEnv("JWT_SECRET"),
+  database:{
+    db_uri: getRequiredEnv("DATABASE_URI"),
+  },
 };
