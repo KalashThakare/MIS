@@ -2,13 +2,14 @@ import cors from "cors";
 import express, { Express } from "express";
 import helmet from "helmet";
 import { env } from "./config/env";
+import { actionItemsRoutes } from "./modules/action-items";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health";
+import { meetingRoutes } from "./modules/meetings/meetings.route";
 import { errorHandler } from "./shared/middleware/errorHandler";
 import { notFoundHandler } from "./shared/middleware/notFoundHandler";
 import { requestLogger } from "./shared/middleware/requestLogger";
 import { responseHandler } from "./shared/middleware/responseHandler";
-import { meetingRoutes } from "./modules/meetings/meetings.route";
 
 export function createApp(): Express {
   const app = express();
@@ -25,6 +26,7 @@ export function createApp(): Express {
   app.use(prefix, healthRoutes);
   app.use(prefix, authRoutes);
   app.use(prefix, meetingRoutes);
+  app.use(prefix, actionItemsRoutes);
 
 
   app.use(notFoundHandler);
