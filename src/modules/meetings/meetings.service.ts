@@ -55,6 +55,7 @@ export class MeetingService {
         }
 
         return {
+            id: meeting.id,
             title: meeting.title,
             meetingDate: meeting.meetingDate,
             participants: meeting.participants.map((p) => p.email),
