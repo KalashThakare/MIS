@@ -1,13 +1,13 @@
 export interface TranscriptEntry {
-  timestamp: string;           
-  speaker: string;             
-  text: string;                
+  timestamp: string;
+  speaker: string;
+  text: string;
 }
 
 export interface CreateMeetingInput {
-  title: string;               
-  participants: string[];      
-  meetingDate: string;         
+  title: string;
+  participants: string[];
+  meetingDate: string;
   transcript: TranscriptEntry[];
 }
 
@@ -15,7 +15,7 @@ export interface CreateMeetingInput {
 export interface CreateMeetingDTO {
   title: string;
   participants: string[];
-  meetingDate: Date;         
+  meetingDate: Date;
   transcript: TranscriptEntry[];
 }
 
@@ -42,7 +42,7 @@ export interface MeetingParticipant {
   id: string;
   meetingId: string;
   userId: string | null;
-  email: string; 
+  email: string;
   createdAt: Date;
 }
 
@@ -55,7 +55,7 @@ export interface MeetingResponse {
 }
 
 export interface MeetingWithParticipants extends Meeting {
-  participants: MeetingParticipant[]; 
+  participants: MeetingParticipant[];
 }
 
 export interface PaginationInput {

@@ -5,7 +5,7 @@ import { env } from "./config/env";
 import { actionItemsRoutes } from "./modules/action-items";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health";
-import { meetingRoutes } from "./modules/meetings/meetings.route";
+import { meetingRoutes } from "./modules/meetings";
 import { errorHandler } from "./shared/middleware/errorHandler";
 import { notFoundHandler } from "./shared/middleware/notFoundHandler";
 import { requestLogger } from "./shared/middleware/requestLogger";
