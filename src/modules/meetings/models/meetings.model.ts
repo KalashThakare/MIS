@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
-import { Meeting, TranscriptEntry } from "./meetings.type";
+import { Meeting, TranscriptEntry } from "../meetings.type";
 
 type MeetingCreationAttributes = Optional<Meeting, "id" | "createdAt" | "updatedAt" | "deletedAt">;
 

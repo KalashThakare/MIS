@@ -8,6 +8,7 @@ import { errorHandler } from "./shared/middleware/errorHandler";
 import { notFoundHandler } from "./shared/middleware/notFoundHandler";
 import { requestLogger } from "./shared/middleware/requestLogger";
 import { responseHandler } from "./shared/middleware/responseHandler";
+import { meetingRoutes } from "./modules/meetings/meetings.route";
 
 export function createApp(): Express {
   const app = express();
@@ -20,8 +21,11 @@ export function createApp(): Express {
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true }));
 
-  app.use(env.apiPrefix, authRoutes);
-  app.use(env.apiPrefix, healthRoutes);
+  const prefix = env.apiPrefix
+  app.use(prefix, healthRoutes);
+  app.use(prefix, authRoutes);
+  app.use(prefix, meetingRoutes);
+
 
   app.use(notFoundHandler);
   app.use(errorHandler);

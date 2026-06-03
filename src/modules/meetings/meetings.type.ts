@@ -19,6 +19,14 @@ export interface CreateMeetingDTO {
   transcript: TranscriptEntry[];
 }
 
+export interface CreateMeetingRecordInput {
+  title: string;
+  participants: string[];
+  meetingDate: Date;
+  transcript: TranscriptEntry[];
+  createdBy: string;
+}
+
 export interface Meeting {
   id: string;
   title: string;
@@ -36,4 +44,31 @@ export interface MeetingParticipant {
   userId: string | null;
   email: string; 
   createdAt: Date;
+}
+
+export interface MeetingResponse {
+  id?: string;
+  title: string;
+  meetingDate: Date;
+  participants: string[];
+  transcript: TranscriptEntry[];
+}
+
+export interface MeetingWithParticipants extends Meeting {
+  participants: MeetingParticipant[]; 
+}
+
+export interface PaginationInput {
+  page: number;
+  limit: number;
+}
+
+export interface PaginatedMeetingsResponse {
+  items: MeetingResponse[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
