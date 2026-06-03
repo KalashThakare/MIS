@@ -1816,6 +1816,7 @@ __metadata:
     express: "npm:^4.21.2"
     helmet: "npm:^8.0.0"
     jsonwebtoken: "npm:^9.0.2"
+    node-cron: "npm:^4.2.1"
     pg: "npm:^8.21.0"
     pino: "npm:^10.3.1"
     sequelize: "npm:^6.37.8"
@@ -1869,6 +1870,13 @@ __metadata:
   version: 0.6.3
   resolution: "negotiator@npm:0.6.3"
   checksum: 10c0/3ec9fd413e7bf071c937ae60d572bc67155262068ed522cf4b3be5edbe6ddf67d095ec03a3a14ebf8fc8e95f8e1d61be4869db0dbb0de696f6b837358bd43fc2
+  languageName: node
+  linkType: hard
+
+"node-cron@npm:^4.2.1":
+  version: 4.2.1
+  resolution: "node-cron@npm:4.2.1"
+  checksum: 10c0/804df01df230e96fd2f8ffcde004f4d5af953bccdf3ccf993dc450526dd65f553a2f2ad4bc0faf55c90c38cbc99c9ddbb88ee16cba3fc6bc74e606da6efb249e
   languageName: node
   linkType: hard
 

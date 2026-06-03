@@ -1,0 +1,22 @@
+import cron from "node-cron";
+import { ReminderService } from "../modules/reminders/reminder.service";
+import { ReminderRepository } from "../modules/reminders/reminder.repository";
+import { logger } from "../shared/logger/pino";
+
+const reminderService = new ReminderService(new ReminderRepository);
+
+export function startReminder(): void {
+
+    cron.schedule("0 */6 * * *", async () => { // I have kept scheduler to run every 6 hrs
+        logger.info("Reminder scheduler triggered");
+
+        try {
+            await reminderService.processOverdueReminders();
+        } catch (err) {
+            logger.error({ err }, "Reminder scheduler failed");
+        }
+    });
+
+    logger.info("Reminder scheduler started — runs daily at 9:00 AM");
+
+}

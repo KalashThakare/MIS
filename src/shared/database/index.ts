@@ -3,6 +3,7 @@ import { env } from "../../config/env";
 import { defineActionItemModel } from "../../modules/action-items/action-item.model";
 import { defineMeetingParticipantModel } from "../../modules/meetings/models/meeting-participant.model";
 import { defineMeetingModel } from "../../modules/meetings/models/meetings.model";
+import { defineReminderLogModel } from "../../modules/reminders/reminder.model";
 import { defineUserModel } from "../../modules/user/user.model";
 import { logger } from "../logger/pino";
 
@@ -11,7 +12,8 @@ const modelDefiners = [
     defineUserModel,
     defineMeetingModel,
     defineMeetingParticipantModel,
-    defineActionItemModel
+    defineActionItemModel,
+    defineReminderLogModel
 ];
 
 export const initModels = () => {

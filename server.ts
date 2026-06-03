@@ -5,6 +5,7 @@ import { logger } from "./src/shared/logger/pino";
 import sequelize, { connectDB } from "./src/config/db";
 import { initModels, syncModels } from "./src/shared/database";
 import { defineAssociations } from "./src/shared/database/associations";
+import { startReminder } from "./src/jobs/remainder.job";
 
 const app = createApp();
 const server = createServer(app);
@@ -15,6 +16,8 @@ async function startServer() {
     initModels();
     defineAssociations();
     await syncModels();
+
+    startReminder();
 
     server.listen(env.port, () => {
       logger.info(`Server running on port ${env.port}`);
