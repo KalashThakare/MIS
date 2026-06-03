@@ -1,22 +1,21 @@
 import { createServer } from "node:http";
 import { createApp } from "./src/app";
 import { env } from "./src/config/env";
-import { PinoLogger } from "./src/shared/logger/PinoLogger";
+import { logger } from "./src/shared/logger/pino";
 
-const logger = new PinoLogger();
 const app = createApp();
 const server = createServer(app);
 
 server.listen(env.port, () => {
-  logger.info(`HTTP server listening on port ${env.port}`);
+  logger.info({ port: env.port }, "HTTP server listening.");
 });
 
 function shutdown(signal: NodeJS.Signals): void {
-  logger.info(`${signal} received. Closing HTTP server.`);
+  logger.info({ signal }, "Shutdown signal received. Closing HTTP server.");
 
   server.close((error) => {
     if (error) {
-      logger.error("HTTP server closed with an error.", error);
+      logger.error({ error }, "HTTP server closed with an error.");
       process.exit(1);
     }
 

@@ -1,14 +1,12 @@
 import { ErrorRequestHandler } from "express";
 import { env } from "../../config/env";
 import { AppError } from "../errors/AppError";
-import { PinoLogger } from "../logger/PinoLogger";
-
-const logger = new PinoLogger();
+import { logger } from "../logger/pino";
 
 export const errorHandler: ErrorRequestHandler = (error, request, response, _next) => {
   const appError = error instanceof AppError ? error : new AppError("Internal server error");
 
-  logger.error("HTTP request failed.", {
+  logger.error({
     traceId: request.traceId,
     method: request.method,
     path: request.originalUrl,
@@ -19,7 +17,7 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
       stack: error instanceof Error ? error.stack : undefined,
       isOperational: appError.isOperational
     }
-  });
+  }, "HTTP request failed.");
 
   response.status(appError.statusCode).json({
     error: {
