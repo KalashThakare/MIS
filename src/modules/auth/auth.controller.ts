@@ -8,7 +8,7 @@ export class AuthController {
     try {
       const authResponse = await this.authService.register(request.body);
 
-      response.status(201).json(authResponse);
+      response.success(authResponse, 201);
     } catch (error) {
       next(error);
     }
@@ -18,7 +18,7 @@ export class AuthController {
     try {
       const authResponse = await this.authService.login(request.body);
 
-      response.status(200).json(authResponse);
+      response.success(authResponse);
     } catch (error) {
       next(error);
     }
@@ -28,7 +28,7 @@ export class AuthController {
     try {
       const user = await this.authService.getCurrentUser(request.user!.id);
 
-      response.status(200).json({ user });
+      response.success({ user });
     } catch (error) {
       next(error);
     }

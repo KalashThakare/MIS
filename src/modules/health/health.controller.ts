@@ -5,6 +5,6 @@ export class HealthController {
   constructor(private readonly healthService: HealthService) {}
 
   show(_request: Request, response: Response): void {
-    response.status(200).json(this.healthService.getStatus());
+    response.success(this.healthService.getStatus());
   }
 }

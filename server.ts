@@ -4,6 +4,7 @@ import { env } from "./src/config/env";
 import { logger } from "./src/shared/logger/pino";
 import sequelize, { connectDB } from "./src/config/db";
 import { initModels, syncModels } from "./src/shared/database";
+import { defineAssociations } from "./src/shared/database/associations";
 
 const app = createApp();
 const server = createServer(app);
@@ -12,6 +13,7 @@ async function startServer() {
   try {
     await connectDB();
     initModels();
+    defineAssociations();
     await syncModels();
 
     server.listen(env.port, () => {

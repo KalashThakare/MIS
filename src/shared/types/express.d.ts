@@ -7,6 +7,10 @@ declare global {
         email: string;
       };
     }
+
+    interface Response {
+      success(data?: unknown, statusCode?: number): void;
+    }
   }
 }
 

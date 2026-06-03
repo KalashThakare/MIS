@@ -1,5 +1,4 @@
 import { ErrorRequestHandler } from "express";
-import { env } from "../../config/env";
 import { AppError } from "../errors/AppError";
 import { logger } from "../logger/pino";
 
@@ -20,10 +19,12 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
   }, "HTTP request failed.");
 
   response.status(appError.statusCode).json({
+    traceId: request.traceId,
+    success: false,
     error: {
+      code: appError.code,
       message: appError.message,
-      ...(appError.details !== undefined && { details: appError.details }),
-      ...(env.nodeEnv !== "production" && { stack: error instanceof Error ? error.stack : undefined })
+      ...(appError.details !== undefined && { details: appError.details })
     }
   });
 };
@@ -34,7 +35,7 @@ function toAppError(error: unknown): AppError {
   }
 
   if (isMalformedJsonError(error)) {
-    return new AppError("Malformed JSON request body.", 400);
+    return new AppError("Malformed JSON request body.", 400, true, undefined, "MALFORMED_REQUEST");
   }
 
   return new AppError("Internal server error");

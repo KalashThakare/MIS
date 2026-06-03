@@ -7,6 +7,6 @@ export interface ValidationIssue {
 
 export class ValidationError extends AppError {
   constructor(issues: ValidationIssue[]) {
-    super("Validation failed.", 400, true, issues);
+    super("Validation failed.", 400, true, issues, "VALIDATION_ERROR");
   }
 }
