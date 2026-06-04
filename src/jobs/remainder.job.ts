@@ -7,7 +7,7 @@ const reminderService = new ReminderService(new ReminderRepository);
 
 export function startReminder(): void {
 
-    cron.schedule("0 */6 * * *", async () => { // I have kept scheduler to run every 6 hrs
+    cron.schedule("*/5 * * * *", async () => { // I have kept scheduler to run every 5 min
         logger.info("Reminder scheduler triggered");
 
         try {
@@ -17,6 +17,6 @@ export function startReminder(): void {
         }
     });
 
-    logger.info("Reminder scheduler started — runs every 6 hrs");
+    logger.info("Reminder scheduler started, runs every 5 min");
 
 }
