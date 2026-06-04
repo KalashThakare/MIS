@@ -27,9 +27,14 @@ export class ReminderService {
     }
 
     private async sendReminder(item: ActionItem): Promise<void> {
+        if (!item.assigneeId) {
+            logger.info({ actionItemId: item.id }, "Skipping reminder for unassigned action item");
+            return;
+        }
+
+        const assigneeId = item.assigneeId;
 
         try {
-
             const alreadyReminded = await this.reminderRepository.wasRecentlyReminded(item.id);
 
             if (alreadyReminded) {
@@ -37,13 +42,13 @@ export class ReminderService {
                 return;
             }
 
-            const asigneeDetails = await this.reminderRepository.getAsigneeDetails(item.assigneeId);
+            const asigneeDetails = await this.reminderRepository.getAsigneeDetails(assigneeId);
 
             await this.slackService.sendOverdueMessage(item, asigneeDetails)
 
             await this.reminderRepository.logReminder({
                 actionItemId: item.id,
-                sentTo: item.assigneeId,
+                sentTo: assigneeId,
                 status: "SENT",
                 error: null,
             });
@@ -54,7 +59,7 @@ export class ReminderService {
 
             await this.reminderRepository.logReminder({
                 actionItemId: item.id,
-                sentTo: item.assigneeId,
+                sentTo: assigneeId,
                 status: "FAILED",
                 error: error instanceof Error ? error.message : "Unknown error",
             });

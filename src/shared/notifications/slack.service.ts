@@ -9,6 +9,11 @@ const webhook = new IncomingWebhook(env.slack.webhook_url);
 export class SlackService {
 
     async sendOverdueMessage(item: ActionItem, assigneeDetails: asigneeDetails): Promise<void> {
+        if (!item.dueDate) {
+            logger.warn({ actionItemId: item.id }, "Skipping overdue reminder for action item without due date");
+            return;
+        }
+
         const daysOverdue = Math.floor(
             (Date.now() - new Date(item.dueDate).getTime()) / (1000 * 60 * 60 * 24)
         );

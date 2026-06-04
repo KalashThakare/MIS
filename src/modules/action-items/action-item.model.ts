@@ -9,8 +9,8 @@ export class ActionItemModel extends Model<ActionItem, ActionItemCreationAttribu
   declare meetingId: string;
   declare title: string;
   declare description: string | null;
-  declare assigneeId: string;
-  declare dueDate: Date;
+  declare assigneeId: string | null;
+  declare dueDate: Date | null;
   declare status: ActionItemStatus;
   declare createdBy: string;
   declare readonly createdAt: Date;
@@ -43,12 +43,12 @@ export function defineActionItemModel(sequelize: Sequelize) {
       },
       assigneeId: {
         type: DataTypes.UUID,
-        allowNull: false,
+        allowNull: true,
         references: { model: "users", key: "id" },
       },
       dueDate: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       status: {
         type: DataTypes.ENUM(...ACTION_ITEM_STATUSES),

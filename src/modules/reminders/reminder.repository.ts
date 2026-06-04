@@ -10,6 +10,7 @@ export class ReminderRepository {
         return ActionItemModel.findAll({
             where: {
                 dueDate: { [Op.lt]: new Date() },
+                assigneeId: { [Op.ne]: null },
                 status: { [Op.ne]: "COMPLETED" },
                 deletedAt: null,
             },

@@ -7,8 +7,8 @@ export interface ActionItem {
   meetingId: string;
   title: string;
   description: string | null;
-  assigneeId: string;
-  dueDate: Date;
+  assigneeId: string | null;
+  dueDate: Date | null;
   status: ActionItemStatus;
   createdBy: string;
   createdAt: Date;
@@ -28,8 +28,8 @@ export interface CreateActionItemRecordInput {
   meetingId: string;
   title: string;
   description: string | null;
-  assigneeId: string;
-  dueDate: Date;
+  assigneeId: string | null;
+  dueDate: Date | null;
   createdBy: string;
 }
 
