@@ -1,7 +1,8 @@
 import { Op } from "sequelize";
 import { ActionItemModel } from "../action-items/action-item.model";
 import { ReminderLogModel } from "./reminder.model";
-import { ReminderLog } from "./reminder.types";
+import { asigneeDetails, ReminderLog } from "./reminder.types";
+import { UserModel } from "../user/user.model";
 
 export class ReminderRepository {
 
@@ -29,5 +30,19 @@ export class ReminderRepository {
 
     async logReminder(data: Omit<ReminderLog, "id" | "sentAt">): Promise<void> {
         await ReminderLogModel.create(data);
+    }
+
+    async getAsigneeDetails(asigneeId: string): Promise<asigneeDetails> {
+        const user = await UserModel.findOne({
+            where: {
+                id: asigneeId,
+            },
+            attributes: ["email", "name"],
+        });
+
+        return {
+            userName: user?.name!, 
+            email: user?.email!
+        };
     }
 }

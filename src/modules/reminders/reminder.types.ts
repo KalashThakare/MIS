@@ -9,3 +9,8 @@ export interface ReminderLog {
   sentAt: Date;
   error: string | null;
 }
+
+export interface asigneeDetails{
+  email: string;
+  userName: string;
+}

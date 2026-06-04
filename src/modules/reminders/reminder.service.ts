@@ -1,10 +1,13 @@
 import { ReminderRepository } from "./reminder.repository";
 import { logger } from "../../shared/logger/pino";
 import { ActionItem } from "../action-items/action-items.types";
+import { SlackService } from "../../shared/notifications/slack.service";
 
 export class ReminderService {
 
     constructor(private readonly reminderRepository: ReminderRepository) { }
+
+    private readonly slackService = new SlackService();
 
     async processOverdueReminders(): Promise<void> {
         logger.info("Running overdue reminders job");
@@ -30,9 +33,13 @@ export class ReminderService {
             const alreadyReminded = await this.reminderRepository.wasRecentlyReminded(item.id);
 
             if (alreadyReminded) {
-                logger.info({ actionItemId: item.id }, "Skipping — reminded within 24 hours");
+                logger.info({ actionItemId: item.id }, "Skipping reminded within 24 hours");
                 return;
             }
+
+            const asigneeDetails = await this.reminderRepository.getAsigneeDetails(item.assigneeId);
+
+            await this.slackService.sendOverdueMessage(item, asigneeDetails)
 
             await this.reminderRepository.logReminder({
                 actionItemId: item.id,

@@ -12,6 +12,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@slack/types": "^2.21.1",
+    "@slack/web-api": "^7.16.0",
+    "@slack/webhook": "^7.0.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

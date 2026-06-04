@@ -9,12 +9,17 @@ interface Env {
   jwtExpiresIn: string;
   jwtSecret: string;
   database: Database;
+  slack: Slack;
   nodeEnv: NodeEnv;
   port: number;
 }
 
-interface Database{
+interface Database {
   db_uri: string
+}
+
+interface Slack {
+  webhook_url: string
 }
 
 function parsePort(value: string | undefined): number {
@@ -53,7 +58,10 @@ export const env: Env = {
   apiPrefix: process.env.API_PREFIX ?? "/api/v1",
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? "1d",
   jwtSecret: getRequiredEnv("JWT_SECRET"),
-  database:{
+  database: {
     db_uri: getRequiredEnv("DATABASE_URI"),
   },
+  slack: {
+    webhook_url: getRequiredEnv("SLACK_WEBHOOK_URL")
+  }
 };
