@@ -1,8 +1,9 @@
 import { MeetingRepository } from "./meetings.repository";
 import { CreateMeetingInput, Meeting, MeetingResponse, PaginatedMeetingsResponse } from "./types/meetings.type";
 import { AppError } from "../../shared/errors/AppError";
-import { GroqService } from "../../shared/groq/groq.service";
+
 import { MeetingAnalysisResponse } from "./types/meeting-analysis.types";
+import { GroqService } from "../../shared/integrations/groq/groq.service";
 
 export class MeetingService {
 

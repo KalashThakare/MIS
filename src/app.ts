@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { Express } from "express";
 import helmet from "helmet";
+import swaggerUi from "swagger-ui-express";
 import { env } from "./config/env";
 import { actionItemsRoutes } from "./modules/action-items";
 import { authRoutes } from "./modules/auth";
@@ -11,6 +12,8 @@ import { notFoundHandler } from "./shared/middleware/notFoundHandler";
 import { globalRateLimiter } from "./shared/middleware/rateLimiter";
 import { requestLogger } from "./shared/middleware/requestLogger";
 import { responseHandler } from "./shared/middleware/responseHandler";
+import { openApiSpec } from "./shared/integrations/swagger/openapi";
+
 
 export function createApp(): Express {
   const app = express();
@@ -23,6 +26,8 @@ export function createApp(): Express {
   app.use(globalRateLimiter);
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true }));
+  app.get("/docs.json", (_request, response) => response.json(openApiSpec));
+  app.use("/docs", ...swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
   const prefix = env.apiPrefix
   app.use(prefix, healthRoutes);

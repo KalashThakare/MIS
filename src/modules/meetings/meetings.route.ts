@@ -5,7 +5,8 @@ import { MeetingRepository } from "./meetings.repository";
 import { MeetingService } from "./meetings.service";
 import { MeetingController } from "./meetings.controller";
 import { validateCreateMeeting, validateListMeetings, validateMeetingIdParams } from "./meetings.validation";
-import { GroqService } from "../../shared/groq/groq.service";
+import { GroqService } from "../../shared/integrations/groq/groq.service";
+
 
 const meetingRepository = new MeetingRepository();
 const groqService = new GroqService();
