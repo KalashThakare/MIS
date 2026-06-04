@@ -1,11 +1,15 @@
 import { MeetingRepository } from "./meetings.repository";
-import { CreateMeetingInput, Meeting, MeetingResponse, PaginatedMeetingsResponse } from "./meetings.type";
+import { CreateMeetingInput, Meeting, MeetingResponse, PaginatedMeetingsResponse } from "./types/meetings.type";
 import { AppError } from "../../shared/errors/AppError";
-import { MeetingModel } from "./models/meetings.model";
+import { GroqService } from "../../shared/groq/groq.service";
+import { MeetingAnalysisResponse } from "./types/meeting-analysis.types";
 
 export class MeetingService {
 
-    constructor(private readonly meetingRepository: MeetingRepository) { };
+    constructor(
+        private readonly meetingRepository: MeetingRepository,
+        private readonly groqService: GroqService
+    ) { };
 
     async createMeetingService(input: CreateMeetingInput, createdBy: string): Promise<Meeting> {
         const title = input.title?.trim();
@@ -94,5 +98,19 @@ export class MeetingService {
         }
 
         return parsed;
+    }
+
+    async analyseMeeting(meetingId: string): Promise<MeetingAnalysisResponse> {
+        const meeting = await this.meetingRepository.getMeetingById(meetingId);
+
+        if (!meeting) {
+            throw new AppError("Meeting not found.", 404);
+        }
+
+        if (!Array.isArray(meeting.transcript) || meeting.transcript.length === 0) {
+            throw new AppError("Meeting has no transcript to analyse.", 400);
+        }
+
+        return this.groqService.analyzeMeeting(meeting.transcript);
     }
 }

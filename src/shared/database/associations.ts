@@ -1,4 +1,5 @@
 import { ActionItemModel } from "../../modules/action-items/action-item.model";
+import { MeetingAnalysisModel } from "../../modules/meetings/models/meeting-analysis.model";
 import { MeetingParticipantModel } from "../../modules/meetings/models/meeting-participant.model";
 import { MeetingModel } from "../../modules/meetings/models/meetings.model";
 import { ReminderLogModel } from "../../modules/reminders/reminder.model";
@@ -23,4 +24,8 @@ export function defineAssociations() {
 
   UserModel.hasMany(ReminderLogModel, { foreignKey: "sentTo", as: "remindersReceived" });
   ReminderLogModel.belongsTo(UserModel, { foreignKey: "sentTo", as: "recipient" });
+
+  MeetingAnalysisModel.belongsTo(MeetingModel, { foreignKey: "meetingId", as: "meeting", });
+  MeetingModel.hasOne(MeetingAnalysisModel, { foreignKey: "meetingId", as: "analysis", });
+  
 }

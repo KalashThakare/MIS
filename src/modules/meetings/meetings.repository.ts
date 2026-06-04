@@ -1,7 +1,7 @@
 import sequelize from "../../config/db";
 import { MeetingParticipantModel } from "./models/meeting-participant.model";
 import { MeetingModel } from "./models/meetings.model";
-import { CreateMeetingRecordInput, Meeting, MeetingWithParticipants, PaginationInput } from "./meetings.type";
+import { CreateMeetingRecordInput, Meeting, MeetingWithParticipants, PaginationInput } from "./types/meetings.type";
 
 export class MeetingRepository {
     async create(input: CreateMeetingRecordInput): Promise<Meeting> {

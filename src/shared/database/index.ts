@@ -1,6 +1,7 @@
 import sequelize from "../../config/db";
 import { env } from "../../config/env";
 import { defineActionItemModel } from "../../modules/action-items/action-item.model";
+import { defineMeetingAnalysisModel } from "../../modules/meetings/models/meeting-analysis.model";
 import { defineMeetingParticipantModel } from "../../modules/meetings/models/meeting-participant.model";
 import { defineMeetingModel } from "../../modules/meetings/models/meetings.model";
 import { defineReminderLogModel } from "../../modules/reminders/reminder.model";
@@ -13,7 +14,8 @@ const modelDefiners = [
     defineMeetingModel,
     defineMeetingParticipantModel,
     defineActionItemModel,
-    defineReminderLogModel
+    defineReminderLogModel,
+    defineMeetingAnalysisModel
 ];
 
 export const initModels = () => {

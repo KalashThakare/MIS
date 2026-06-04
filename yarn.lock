@@ -1687,6 +1687,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"groq-sdk@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "groq-sdk@npm:1.2.1"
+  bin:
+    groq-sdk: bin/cli
+  checksum: 10c0/0947214ee11becd012888068c5a5c11d18fc61b1a7d0b659ae8f356b131fe2adc8676148b8c56eea13412ca6492b953d0529dfb0dedfa83065d103d7f667f981
+  languageName: node
+  linkType: hard
+
 "has-symbols@npm:^1.0.3, has-symbols@npm:^1.1.0":
   version: 1.1.0
   resolution: "has-symbols@npm:1.1.0"
@@ -1997,9 +2006,11 @@ __metadata:
     cors: "npm:^2.8.5"
     dotenv: "npm:^16.4.7"
     express: "npm:^4.21.2"
+    groq-sdk: "npm:^1.2.1"
     helmet: "npm:^8.0.0"
     jsonwebtoken: "npm:^9.0.2"
     node-cron: "npm:^4.2.1"
+    openai: "npm:^6.42.0"
     pg: "npm:^8.21.0"
     pino: "npm:^10.3.1"
     sequelize: "npm:^6.37.8"
@@ -2121,6 +2132,21 @@ __metadata:
   dependencies:
     ee-first: "npm:1.1.1"
   checksum: 10c0/46fb11b9063782f2d9968863d9cbba33d77aa13c17f895f56129c274318b86500b22af3a160fe9995aa41317efcd22941b6eba747f718ced08d9a73afdb087b4
+  languageName: node
+  linkType: hard
+
+"openai@npm:^6.42.0":
+  version: 6.42.0
+  resolution: "openai@npm:6.42.0"
+  peerDependencies:
+    ws: ^8.18.0
+    zod: ^3.25 || ^4.0
+  peerDependenciesMeta:
+    ws:
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/df30024c14c758ad159885016a3d6ed7f6596b2b3de3cc7b7c625bebe032fd676f9b324fd2b9f4b5061e7ce64b0f7ae7e52060decc5b0c6cce9029cba3afd3fc
   languageName: node
   linkType: hard
 

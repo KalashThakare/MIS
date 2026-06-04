@@ -9,6 +9,7 @@ interface Env {
   jwtExpiresIn: string;
   jwtSecret: string;
   database: Database;
+  groq_api_key: string;
   slack: Slack;
   nodeEnv: NodeEnv;
   port: number;
@@ -63,5 +64,6 @@ export const env: Env = {
   },
   slack: {
     webhook_url: getRequiredEnv("SLACK_WEBHOOK_URL")
-  }
+  },
+  groq_api_key: getRequiredEnv("GROQ_API_KEY")
 };
