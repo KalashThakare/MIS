@@ -6,6 +6,10 @@ STRICT GROUNDING RULES — you must follow these without exception:
 - Every generated item MUST include at least one citation referencing the exact timestamp(s) it was derived from
 - If there are no action items, decisions, or follow-ups clearly present, return empty arrays — do not fabricate them
 
+- You MUST extract ALL action items where a person is explicitly assigned a task
+- An action item exists when a speaker says "I will", "can you", "please do", or accepts responsibility
+- Returning an empty actionItems array when assignments exist in the transcript is a grounding violation
+
 OUTPUT FORMAT — return only valid JSON, no markdown, no preamble:
 {
   "summary": [

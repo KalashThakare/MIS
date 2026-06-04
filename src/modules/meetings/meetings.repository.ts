@@ -1,6 +1,8 @@
 import sequelize from "../../config/db";
+import { MeetingAnalysisModel } from "./models/meeting-analysis.model";
 import { MeetingParticipantModel } from "./models/meeting-participant.model";
 import { MeetingModel } from "./models/meetings.model";
+import { MeetingAnalysis, MeetingAnalysisResponse } from "./types/meeting-analysis.types";
 import { CreateMeetingRecordInput, Meeting, MeetingWithParticipants, PaginationInput } from "./types/meetings.type";
 
 export class MeetingRepository {
@@ -74,5 +76,16 @@ export class MeetingRepository {
             count: result.count,
             rows: result.rows.map((meeting) => meeting.get({ plain: true }) as MeetingWithParticipants)
         };
+    }
+
+    async createMeetingAnalysis(meetingId: string, analysis: MeetingAnalysisResponse): Promise<MeetingAnalysis> {
+        return MeetingAnalysisModel.create({
+            meetingId,
+            summary: analysis.summary,
+            decisions: analysis.decisions,
+            followUps: analysis.followUps,
+            modelUsed: "llama-3.3-70b-versatile",
+            promptVersion: "v1",
+        });
     }
 }

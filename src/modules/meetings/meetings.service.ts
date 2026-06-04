@@ -2,7 +2,7 @@ import { MeetingRepository } from "./meetings.repository";
 import { CreateMeetingInput, Meeting, MeetingResponse, PaginatedMeetingsResponse } from "./types/meetings.type";
 import { AppError } from "../../shared/errors/AppError";
 import { GroqService } from "../../shared/groq/groq.service";
-import { MeetingAnalysisResponse } from "./types/meeting-analysis.types";
+import { MeetingAnalysis } from "./types/meeting-analysis.types";
 
 export class MeetingService {
 
@@ -100,7 +100,7 @@ export class MeetingService {
         return parsed;
     }
 
-    async analyseMeeting(meetingId: string): Promise<MeetingAnalysisResponse> {
+    async analyseMeeting(meetingId: string): Promise<MeetingAnalysis> {
         const meeting = await this.meetingRepository.getMeetingById(meetingId);
 
         if (!meeting) {
@@ -111,6 +111,8 @@ export class MeetingService {
             throw new AppError("Meeting has no transcript to analyse.", 400);
         }
 
-        return this.groqService.analyzeMeeting(meeting.transcript);
+        const analysis = await this.groqService.analyzeMeeting(meeting.transcript);
+
+        return this.meetingRepository.createMeetingAnalysis(meetingId, analysis);
     }
 }

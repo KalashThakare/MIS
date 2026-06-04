@@ -35,4 +35,16 @@ export class MeetingController {
             next(error);
         }
     }
+
+    async analyze(request: Request, response: Response, next: NextFunction): Promise<void>{
+        try {
+            const meetingId = request.params.id;
+
+            const analysis = await this.meetingService.analyseMeeting(meetingId);
+
+            response.success(analysis, 200);   
+        } catch (error) {
+            next(error);
+        }
+    }
 }

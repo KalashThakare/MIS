@@ -74,7 +74,7 @@ export function defineMeetingAnalysisModel(sequelize: Sequelize) {
     },
     {
       sequelize,
-      tableName: "meeting_analyses",
+      tableName: "meeting_analysis",
       paranoid: true,
       timestamps: true,
       indexes: [
