@@ -8,6 +8,7 @@ import { healthRoutes } from "./modules/health";
 import { meetingRoutes } from "./modules/meetings";
 import { errorHandler } from "./shared/middleware/errorHandler";
 import { notFoundHandler } from "./shared/middleware/notFoundHandler";
+import { globalRateLimiter } from "./shared/middleware/rateLimiter";
 import { requestLogger } from "./shared/middleware/requestLogger";
 import { responseHandler } from "./shared/middleware/responseHandler";
 
@@ -19,6 +20,7 @@ export function createApp(): Express {
   app.use(helmet());
   app.use(cors());
   app.use(responseHandler);
+  app.use(globalRateLimiter);
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true }));
 

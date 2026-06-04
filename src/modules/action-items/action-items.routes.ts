@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../shared/middleware/authenticate";
+import { apiRateLimiter } from "../../shared/middleware/rateLimiter";
 import { ActionItemsController } from "./action-items.controller";
 import { ActionItemsRepository } from "./action-items.repository";
 import { ActionItemsService } from "./action-items.service";
@@ -14,6 +15,8 @@ const actionItemsService = new ActionItemsService(actionItemsRepository);
 const actionItemsController = new ActionItemsController(actionItemsService);
 
 export const actionItemsRoutes = Router();
+
+actionItemsRoutes.use(apiRateLimiter);
 
 actionItemsRoutes.post(
   "/action-items",
@@ -41,4 +44,3 @@ actionItemsRoutes.get(
   validateListActionItems,
   actionItemsController.list.bind(actionItemsController)
 );
-

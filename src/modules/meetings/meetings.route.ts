@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../../shared/middleware/authenticate";
+import { apiRateLimiter } from "../../shared/middleware/rateLimiter";
 import { MeetingRepository } from "./meetings.repository";
 import { MeetingService } from "./meetings.service";
 import { MeetingController } from "./meetings.controller";
@@ -12,6 +13,8 @@ const meetingService = new MeetingService(meetingRepository, groqService);
 const meetingController = new MeetingController(meetingService);
 
 export const meetingRoutes = Router();
+
+meetingRoutes.use(apiRateLimiter);
 
 meetingRoutes.get(
   "/meetings",
