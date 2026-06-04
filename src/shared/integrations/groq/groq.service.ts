@@ -1,8 +1,8 @@
-import { TranscriptEntry } from "../../modules/meetings/types/meetings.type";
-import { MeetingAnalysisResponse } from "../../modules/meetings/types/meeting-analysis.types";
-import { AppError } from "../errors/AppError";
-import { groqClient } from "../../config/groq";
-import { buildMeetingUserPrompt, MEETING_SYSTEM_PROMPT } from "../prompts/meeting-analysis.prompt";
+import { TranscriptEntry } from "../../../modules/meetings/types/meetings.type";
+import { MeetingAnalysisResponse } from "../../../modules/meetings/types/meeting-analysis.types";
+import { AppError } from "../../errors/AppError";
+import { groqClient } from "../../../config/groq";
+import { buildMeetingUserPrompt, MEETING_SYSTEM_PROMPT } from "../../prompts/meeting-analysis.prompt";
 
 export class GroqService {
 
