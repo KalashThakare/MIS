@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { GroqService } from "../../shared/groq/groq.service";
 import { MeetingAnalysisResponse } from "./types/meeting-analysis.types";
 import { MeetingRepository } from "./meetings.repository";
 import { MeetingService } from "./meetings.service";
+import { GroqService } from "../../shared/integrations/groq/groq.service";
 
 const createMeetingRepository = () => ({
   create: vi.fn(),
@@ -46,6 +46,106 @@ describe("MeetingService", () => {
       participants: ["alice@example.com", "bob@example.com"],
       createdBy: "creator-id",
     }));
+  });
+
+  it("rejects meeting creation when title already exists", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    vi.mocked(repository.findMeetingByTitle).mockResolvedValue(true);
+
+    await expect(service.createMeetingService({
+      title: "Planning",
+      participants: ["alice@example.com"],
+      meetingDate: "2026-06-10T00:00:00.000Z",
+      transcript: [],
+    }, "creator-id")).rejects.toMatchObject({
+      statusCode: 409,
+      message: "Meeting already exists",
+    });
+  });
+
+  it("rejects meeting creation with invalid meeting date", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    vi.mocked(repository.findMeetingByTitle).mockResolvedValue(false);
+
+    await expect(service.createMeetingService({
+      title: "Planning",
+      participants: ["alice@example.com"],
+      meetingDate: "not-a-date",
+      transcript: [],
+    }, "creator-id")).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Meeting date must be valid.",
+    });
+  });
+
+  it("rejects meeting creation with empty participants", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    vi.mocked(repository.findMeetingByTitle).mockResolvedValue(false);
+
+    await expect(service.createMeetingService({
+      title: "Planning",
+      participants: [],
+      meetingDate: "2026-06-10T00:00:00.000Z",
+      transcript: [],
+    }, "creator-id")).rejects.toMatchObject({
+      statusCode: 400,
+      message: "At least one participant is required.",
+    });
+  });
+
+  it("rejects meeting creation when transcript is missing", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    vi.mocked(repository.findMeetingByTitle).mockResolvedValue(false);
+
+    await expect(service.createMeetingService({
+      title: "Planning",
+      participants: ["alice@example.com"],
+      meetingDate: "2026-06-10T00:00:00.000Z",
+      transcript: undefined as never,
+    }, "creator-id")).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Meeting transcript is required.",
+    });
+  });
+
+  it("rejects get meeting when id is missing", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    await expect(service.getMeetingById("")).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Meeting ID is required.",
+    });
+  });
+
+  it("rejects get meeting when meeting does not exist", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    vi.mocked(repository.getMeetingById).mockResolvedValue(null);
+
+    await expect(service.getMeetingById("missing-id")).rejects.toMatchObject({
+      statusCode: 404,
+      message: "Meeting not found.",
+    });
+  });
+
+  it("rejects list meetings when pagination is invalid", async () => {
+    const repository = createMeetingRepository();
+    const service = new MeetingService(repository, createGroqService());
+
+    await expect(service.listMeetings({ page: "0", limit: "-1" })).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Pagination values must be positive integers.",
+    });
   });
 
   it("analyzes a meeting and persists the LLM response with the meeting creator", async () => {

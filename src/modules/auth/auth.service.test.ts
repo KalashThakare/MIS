@@ -14,6 +14,7 @@ vi.mock("../../config/env", () => ({
 vi.mock("bcryptjs", () => ({
   default: {
     compare: vi.fn(),
+    hash: vi.fn(),
   },
 }));
 
@@ -30,6 +31,66 @@ const createRepository = () => ({
 }) as unknown as AuthRepository;
 
 describe("AuthService", () => {
+  it("registers a user with normalized email and hashed password", async () => {
+    const repository = createRepository();
+    const service = new AuthService(repository);
+
+    vi.mocked(repository.findByEmail).mockResolvedValue(null);
+    vi.mocked(bcrypt.hash).mockResolvedValue("hashed-password" as never);
+    vi.mocked(repository.create).mockResolvedValue({
+      id: "user-id",
+      email: "user@example.com",
+      name: "User Name",
+      passwordHash: "hashed-password",
+      createdAt: new Date(),
+    });
+    vi.mocked(jwt.sign).mockReturnValue("signed-token" as never);
+
+    await expect(service.register({
+      email: " USER@example.com ",
+      name: " User Name ",
+      password: "password",
+    })).resolves.toEqual({
+      accessToken: "signed-token",
+      tokenType: "Bearer",
+      user: {
+        id: "user-id",
+        email: "user@example.com",
+        name: "User Name",
+      },
+    });
+
+    expect(repository.findByEmail).toHaveBeenCalledWith("user@example.com");
+    expect(bcrypt.hash).toHaveBeenCalledWith("password", 12);
+    expect(repository.create).toHaveBeenCalledWith({
+      email: "user@example.com",
+      name: "User Name",
+      passwordHash: "hashed-password",
+    });
+  });
+
+  it("rejects registration when email already exists", async () => {
+    const repository = createRepository();
+    const service = new AuthService(repository);
+
+    vi.mocked(repository.findByEmail).mockResolvedValue({
+      id: "user-id",
+      email: "user@example.com",
+      name: "User Name",
+      passwordHash: "secret-hash",
+      createdAt: new Date(),
+    });
+
+    await expect(service.register({
+      email: "user@example.com",
+      name: "User Name",
+      password: "password",
+    })).rejects.toMatchObject({
+      statusCode: 409,
+      message: "Email is already registered.",
+    });
+  });
+
   it("logs in with normalized email and returns a bearer token plus public user", async () => {
     const repository = createRepository();
     const service = new AuthService(repository);
@@ -85,6 +146,18 @@ describe("AuthService", () => {
     })).rejects.toMatchObject({
       statusCode: 401,
       message: "Invalid email or password.",
+    });
+  });
+
+  it("rejects when current user cannot be found", async () => {
+    const repository = createRepository();
+    const service = new AuthService(repository);
+
+    vi.mocked(repository.findById).mockResolvedValue(null);
+
+    await expect(service.getCurrentUser("missing-user-id")).rejects.toMatchObject({
+      statusCode: 401,
+      message: "Authenticated user no longer exists.",
     });
   });
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { ActionItemsRepository } from "./action-items.repository";
 import { ActionItemsService } from "./action-items.service";
+import { ActionItem } from "./action-items.types";
 
 const createRepository = () => ({
   create: vi.fn(),
@@ -44,6 +45,22 @@ describe("ActionItemsService", () => {
     }));
   });
 
+  it("rejects creation when due date is invalid", async () => {
+    const repository = createRepository();
+    const service = new ActionItemsService(repository);
+
+    await expect(service.create({
+      meetingId: "meeting-id",
+      title: "Send recap",
+      description: "Share notes",
+      assigneeId: "assignee-id",
+      dueDate: "not-a-date",
+    }, "creator-id")).rejects.toMatchObject({
+      statusCode: 400,
+      message: "Due date must be valid.",
+    });
+  });
+
   it("returns the updated status when repository updates an action item", async () => {
     const repository = createRepository();
     const service = new ActionItemsService(repository);
@@ -74,5 +91,57 @@ describe("ActionItemsService", () => {
       statusCode: 404,
       message: "Action item not found.",
     });
+  });
+
+  it("returns filtered action items from repository", async () => {
+    const repository = createRepository();
+    const service = new ActionItemsService(repository);
+    const items: ActionItem[] = [
+      {
+        id: "action-item-id",
+        meetingId: "meeting-id",
+        title: "Send recap",
+        description: null,
+        assigneeId: null,
+        dueDate: null,
+        status: "PENDING",
+        createdBy: "creator-id",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+    ];
+
+    vi.mocked(repository.list).mockResolvedValue(items);
+
+    await expect(service.list({ status: "PENDING", meetingId: "meeting-id" })).resolves.toEqual(items);
+
+    expect(repository.list).toHaveBeenCalledWith({ status: "PENDING", meetingId: "meeting-id" });
+  });
+
+  it("returns overdue action items from repository", async () => {
+    const repository = createRepository();
+    const service = new ActionItemsService(repository);
+    const items: ActionItem[] = [
+      {
+        id: "action-item-id",
+        meetingId: "meeting-id",
+        title: "Send recap",
+        description: null,
+        assigneeId: null,
+        dueDate: new Date("2026-06-01T00:00:00.000Z"),
+        status: "PENDING",
+        createdBy: "creator-id",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+      },
+    ];
+
+    vi.mocked(repository.listOverdue).mockResolvedValue(items);
+
+    await expect(service.listOverdue()).resolves.toEqual(items);
+
+    expect(repository.listOverdue).toHaveBeenCalledWith();
   });
 });
