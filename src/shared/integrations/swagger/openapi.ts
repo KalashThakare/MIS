@@ -1,4 +1,4 @@
-import { env } from "process";
+import { env } from "../../../config/env";
 import swaggerJsdoc from "swagger-jsdoc";
 
 export const openApiSpec = swaggerJsdoc({
@@ -26,39 +26,77 @@ export const openApiSpec = swaggerJsdoc({
       schemas: {
         ApiError: {
           type: "object",
+          required: ["traceId", "success", "error"],
           properties: {
             traceId: { type: "string" },
             success: { type: "boolean", example: false },
             error: {
               type: "object",
+              required: ["code", "message"],
               properties: {
                 code: { type: "string" },
                 message: { type: "string" },
-              },
-            },
-          },
-        },
-        AuthResponse: {
-          type: "object",
-          properties: {
-            traceId: { type: "string" },
-            success: { type: "boolean", example: true },
-            data: {
-              type: "object",
-              properties: {
-                accessToken: { type: "string" },
-                tokenType: { type: "string", example: "Bearer" },
-                user: { $ref: "#/components/schemas/User" },
+                details: {},
               },
             },
           },
         },
         User: {
           type: "object",
+          required: ["id", "email", "name"],
           properties: {
             id: { type: "string", format: "uuid" },
             email: { type: "string", format: "email" },
             name: { type: "string" },
+          },
+        },
+        AuthData: {
+          type: "object",
+          required: ["accessToken", "tokenType", "user"],
+          properties: {
+            accessToken: { type: "string" },
+            tokenType: { type: "string", example: "Bearer" },
+            user: { $ref: "#/components/schemas/User" },
+          },
+        },
+        AuthResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/AuthData" },
+          },
+        },
+        AuthMeResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              required: ["user"],
+              properties: {
+                user: { $ref: "#/components/schemas/User" },
+              },
+            },
+          },
+        },
+        HealthStatus: {
+          type: "object",
+          required: ["status"],
+          properties: {
+            status: { type: "string", enum: ["ok"] },
+          },
+        },
+        HealthResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/HealthStatus" },
           },
         },
         TranscriptEntry: {
@@ -86,6 +124,193 @@ export const openApiSpec = swaggerJsdoc({
             },
           },
         },
+        MeetingRecord: {
+          type: "object",
+          required: ["id", "title", "meetingDate", "transcript", "createdBy", "createdAt", "updatedAt", "deletedAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            meetingDate: { type: "string", format: "date-time" },
+            transcript: {
+              type: "array",
+              items: { $ref: "#/components/schemas/TranscriptEntry" },
+            },
+            createdBy: { type: "string", format: "uuid" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+            deletedAt: { type: "string", format: "date-time", nullable: true },
+          },
+        },
+        MeetingView: {
+          type: "object",
+          required: ["id", "title", "meetingDate", "participants", "transcript"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            meetingDate: { type: "string", format: "date-time" },
+            participants: {
+              type: "array",
+              items: { type: "string", format: "email" },
+            },
+            transcript: {
+              type: "array",
+              items: { $ref: "#/components/schemas/TranscriptEntry" },
+            },
+          },
+        },
+        Pagination: {
+          type: "object",
+          required: ["page", "limit", "total", "totalPages"],
+          properties: {
+            page: { type: "integer", minimum: 1 },
+            limit: { type: "integer", minimum: 1 },
+            total: { type: "integer", minimum: 0 },
+            totalPages: { type: "integer", minimum: 0 },
+          },
+        },
+        PaginatedMeetings: {
+          type: "object",
+          required: ["items", "pagination"],
+          properties: {
+            items: {
+              type: "array",
+              items: { $ref: "#/components/schemas/MeetingView" },
+            },
+            pagination: { $ref: "#/components/schemas/Pagination" },
+          },
+        },
+        MeetingCreateResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/MeetingRecord" },
+          },
+        },
+        MeetingResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/MeetingView" },
+          },
+        },
+        MeetingsListResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/PaginatedMeetings" },
+          },
+        },
+        Citation: {
+          type: "object",
+          required: ["timestamp"],
+          properties: {
+            timestamp: { type: "string", example: "00:02" },
+          },
+        },
+        AnalysisSummaryItem: {
+          type: "object",
+          required: ["text", "citations"],
+          properties: {
+            text: { type: "string" },
+            citations: {
+              type: "array",
+              items: { $ref: "#/components/schemas/Citation" },
+            },
+          },
+        },
+        AnalysisActionItem: {
+          type: "object",
+          required: ["task", "assignee", "status", "citations"],
+          properties: {
+            task: { type: "string" },
+            assignee: { type: "string", nullable: true },
+            status: { $ref: "#/components/schemas/ActionItemStatus" },
+            citations: {
+              type: "array",
+              items: { $ref: "#/components/schemas/Citation" },
+            },
+          },
+        },
+        AnalysisDecision: {
+          type: "object",
+          required: ["decision", "citations"],
+          properties: {
+            decision: { type: "string" },
+            citations: {
+              type: "array",
+              items: { $ref: "#/components/schemas/Citation" },
+            },
+          },
+        },
+        AnalysisFollowUp: {
+          type: "object",
+          required: ["suggestion", "citations"],
+          properties: {
+            suggestion: { type: "string" },
+            citations: {
+              type: "array",
+              items: { $ref: "#/components/schemas/Citation" },
+            },
+          },
+        },
+        MeetingAnalysisResponseData: {
+          type: "object",
+          required: ["summary", "actionItems", "decisions", "followUps"],
+          properties: {
+            summary: {
+              type: "array",
+              items: { $ref: "#/components/schemas/AnalysisSummaryItem" },
+            },
+            actionItems: {
+              type: "array",
+              items: { $ref: "#/components/schemas/AnalysisActionItem" },
+            },
+            decisions: {
+              type: "array",
+              items: { $ref: "#/components/schemas/AnalysisDecision" },
+            },
+            followUps: {
+              type: "array",
+              items: { $ref: "#/components/schemas/AnalysisFollowUp" },
+            },
+          },
+        },
+        MeetingAnalysisResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/MeetingAnalysisResponseData" },
+          },
+        },
+        ActionItemStatus: {
+          type: "string",
+          enum: ["PENDING", "IN_PROGRESS", "COMPLETED"],
+        },
+        ActionItem: {
+          type: "object",
+          required: ["id", "meetingId", "title", "description", "assigneeId", "dueDate", "status", "createdBy", "createdAt", "updatedAt", "deletedAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            meetingId: { type: "string", format: "uuid" },
+            title: { type: "string" },
+            description: { type: "string", nullable: true },
+            assigneeId: { type: "string", format: "uuid", nullable: true },
+            dueDate: { type: "string", format: "date-time", nullable: true },
+            status: { $ref: "#/components/schemas/ActionItemStatus" },
+            createdBy: { type: "string", format: "uuid" },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+            deletedAt: { type: "string", format: "date-time", nullable: true },
+          },
+        },
         ActionItemInput: {
           type: "object",
           required: ["meetingId", "title", "assigneeId", "dueDate"],
@@ -97,6 +322,74 @@ export const openApiSpec = swaggerJsdoc({
             dueDate: { type: "string", format: "date-time" },
           },
         },
+        ActionItemStatusInput: {
+          type: "object",
+          required: ["status"],
+          properties: {
+            status: { $ref: "#/components/schemas/ActionItemStatus" },
+          },
+        },
+        ActionItemStatusUpdate: {
+          type: "object",
+          required: ["id", "status", "updatedAt"],
+          properties: {
+            id: { type: "string", format: "uuid" },
+            status: { $ref: "#/components/schemas/ActionItemStatus" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        ActionItemListData: {
+          type: "object",
+          required: ["items"],
+          properties: {
+            items: {
+              type: "array",
+              items: { $ref: "#/components/schemas/ActionItem" },
+            },
+          },
+        },
+        ActionItemResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/ActionItem" },
+          },
+        },
+        ActionItemListResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/ActionItemListData" },
+          },
+        },
+        ActionItemStatusResponse: {
+          type: "object",
+          required: ["traceId", "success", "data"],
+          properties: {
+            traceId: { type: "string" },
+            success: { type: "boolean", example: true },
+            data: { $ref: "#/components/schemas/ActionItemStatusUpdate" },
+          },
+        },
+        EvaluationResponse: {
+          type: "object",
+          required: ["candidateName", "email", "repositoryUrl", "deployedUrl", "externalIntegration", "features"],
+          properties: {
+            candidateName: { type: "string" },
+            email: { type: "string", format: "email" },
+            repositoryUrl: { type: "string", format: "uri" },
+            deployedUrl: { type: "string", format: "uri" },
+            externalIntegration: { type: "string" },
+            features: {
+              type: "array",
+              items: { type: "string" },
+            },
+          },
+        },
       },
     },
     paths: {
@@ -105,7 +398,14 @@ export const openApiSpec = swaggerJsdoc({
           tags: ["Health"],
           summary: "Check service health",
           responses: {
-            200: { description: "Service is healthy" },
+            200: {
+              description: "Service is healthy",
+              content: {
+                "application/json": {
+                  schema: { $ref: "#/components/schemas/HealthResponse" },
+                },
+              },
+            },
           },
         },
       },
@@ -166,7 +466,7 @@ export const openApiSpec = swaggerJsdoc({
           summary: "Get current user",
           security: [{ bearerAuth: [] }],
           responses: {
-            200: { description: "Authenticated user" },
+            200: { description: "Authenticated user", content: { "application/json": { schema: { $ref: "#/components/schemas/AuthMeResponse" } } } },
             401: { description: "Unauthorized", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
@@ -181,7 +481,8 @@ export const openApiSpec = swaggerJsdoc({
             { name: "limit", in: "query", schema: { type: "integer", minimum: 1 } },
           ],
           responses: {
-            200: { description: "Meetings list" },
+            200: { description: "Meetings list", content: { "application/json": { schema: { $ref: "#/components/schemas/MeetingsListResponse" } } } },
+            400: { description: "Invalid pagination", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
       },
@@ -199,8 +500,9 @@ export const openApiSpec = swaggerJsdoc({
             },
           },
           responses: {
-            201: { description: "Meeting created" },
+            201: { description: "Meeting created", content: { "application/json": { schema: { $ref: "#/components/schemas/MeetingCreateResponse" } } } },
             400: { description: "Invalid request", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
+            409: { description: "Meeting already exists", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
       },
@@ -213,7 +515,8 @@ export const openApiSpec = swaggerJsdoc({
             { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
           ],
           responses: {
-            200: { description: "Meeting details" },
+            200: { description: "Meeting details", content: { "application/json": { schema: { $ref: "#/components/schemas/MeetingResponse" } } } },
+            400: { description: "Missing meeting id", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
             404: { description: "Meeting not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
@@ -227,7 +530,8 @@ export const openApiSpec = swaggerJsdoc({
             { name: "id", in: "path", required: true, schema: { type: "string", format: "uuid" } },
           ],
           responses: {
-            200: { description: "Meeting analysis response" },
+            200: { description: "Meeting analysis response", content: { "application/json": { schema: { $ref: "#/components/schemas/MeetingAnalysisResponse" } } } },
+            400: { description: "Meeting transcript missing", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
             404: { description: "Meeting not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
@@ -243,7 +547,7 @@ export const openApiSpec = swaggerJsdoc({
             { name: "meetingId", in: "query", schema: { type: "string", format: "uuid" } },
           ],
           responses: {
-            200: { description: "Action items list" },
+            200: { description: "Action items list", content: { "application/json": { schema: { $ref: "#/components/schemas/ActionItemListResponse" } } } },
           },
         },
         post: {
@@ -259,7 +563,7 @@ export const openApiSpec = swaggerJsdoc({
             },
           },
           responses: {
-            201: { description: "Action item created" },
+            201: { description: "Action item created", content: { "application/json": { schema: { $ref: "#/components/schemas/ActionItemResponse" } } } },
             400: { description: "Invalid request", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
@@ -276,18 +580,13 @@ export const openApiSpec = swaggerJsdoc({
             required: true,
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  required: ["status"],
-                  properties: {
-                    status: { type: "string", enum: ["PENDING", "IN_PROGRESS", "COMPLETED"] },
-                  },
-                },
+                schema: { $ref: "#/components/schemas/ActionItemStatusInput" },
               },
             },
           },
           responses: {
-            200: { description: "Status updated" },
+            200: { description: "Status updated", content: { "application/json": { schema: { $ref: "#/components/schemas/ActionItemStatusResponse" } } } },
+            400: { description: "Invalid request", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
             404: { description: "Action item not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ApiError" } } } },
           },
         },
@@ -298,7 +597,16 @@ export const openApiSpec = swaggerJsdoc({
           summary: "List overdue action items",
           security: [{ bearerAuth: [] }],
           responses: {
-            200: { description: "Overdue action items" },
+            200: { description: "Overdue action items", content: { "application/json": { schema: { $ref: "#/components/schemas/ActionItemListResponse" } } } },
+          },
+        },
+      },
+      "/evaluation": {
+        get: {
+          tags: ["Evaluation"],
+          summary: "Get evaluation info",
+          responses: {
+            200: { description: "Evaluation response", content: { "application/json": { schema: { $ref: "#/components/schemas/EvaluationResponse" } } } },
           },
         },
       },

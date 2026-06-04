@@ -13,6 +13,7 @@ import { globalRateLimiter } from "./shared/middleware/rateLimiter";
 import { requestLogger } from "./shared/middleware/requestLogger";
 import { responseHandler } from "./shared/middleware/responseHandler";
 import { openApiSpec } from "./shared/integrations/swagger/openapi";
+import { evaluationRoutes } from "./modules/evaluation/evaluation";
 
 
 export function createApp(): Express {
@@ -31,9 +32,11 @@ export function createApp(): Express {
 
   const prefix = env.apiPrefix
   app.use(prefix, healthRoutes);
+  app.use(prefix, evaluationRoutes);
   app.use(prefix, authRoutes);
   app.use(prefix, meetingRoutes);
   app.use(prefix, actionItemsRoutes);
+
 
 
   app.use(notFoundHandler);
