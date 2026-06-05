@@ -7,7 +7,7 @@ evaluationRoutes.get("/evaluation", (_req: Request, res: Response) => {
     candidateName: "Kalash G. Thakare",
     email: "kalashthakare898@gmail.com",
     repositoryUrl: "https://github.com/KalashThakare/MIS",
-    deployedUrl: "https://example.com",
+    deployedUrl: "https://meeting-intelligence-system-c2tt.onrender.com/api/v1/health",
     externalIntegration: "Slack Webhook",
     features: [
       "Authentication",
